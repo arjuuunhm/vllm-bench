@@ -85,7 +85,6 @@ python summarize.py results/e1_decode
 - Every result JSON gets a `harness` block: bench command, wall time, and **deltas of `/metrics`
   counters** (prefix cache queries/hits, external (offload) cache hits, preemptions, token counts).
 - Bench defaults: p50/p90/p99 for TTFT/TPOT/ITL/E2EL, `--seed 0`.
-
 - **Prefix cache is reset before every point** (`POST /reset_prefix_cache?reset_external=true`;
   servers launch with `VLLM_SERVER_DEV_MODE=1` to expose it). Each result's `harness` block
   has `prefix_cache_reset: true`.
