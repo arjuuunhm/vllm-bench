@@ -1,0 +1,12 @@
+{
+  "model": "Qwen/Qwen3-8B-FP8",
+  "server_args": [
+    "--max-model-len",
+    "8192",
+    "--gpu-memory-utilization",
+    "0.88"
+  ],
+  "env": {},
+  "vllm_git": "proto-v0.4.0-124-g0cbac6cd13",
+  "startup_s": 36.02437877655029
+}

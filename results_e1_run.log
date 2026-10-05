@@ -1,0 +1,31 @@
+[default] starting server: --max-model-len 8192 --gpu-memory-utilization 0.88
+[default] healthy after 36s
+[default] decode max-concurrency=1: TTFT p50 19.4ms  TPOT p50 12.30ms  out 81 tok/s
+[default] decode max-concurrency=2: TTFT p50 31.0ms  TPOT p50 12.23ms  out 162 tok/s
+[default] decode max-concurrency=4: TTFT p50 31.2ms  TPOT p50 12.34ms  out 322 tok/s
+[default] decode max-concurrency=8: TTFT p50 46.0ms  TPOT p50 12.60ms  out 627 tok/s
+[default] decode max-concurrency=16: TTFT p50 59.3ms  TPOT p50 12.85ms  out 1216 tok/s
+[default] decode max-concurrency=32: TTFT p50 123.9ms  TPOT p50 13.80ms  out 2237 tok/s
+[default] decode max-concurrency=64: TTFT p50 287.0ms  TPOT p50 16.03ms  out 3750 tok/s
+[default] server stopped
+[no_async] starting server: --max-model-len 8192 --gpu-memory-utilization 0.88 --no-async-scheduling
+[no_async] healthy after 56s
+[no_async] decode max-concurrency=1: TTFT p50 17.7ms  TPOT p50 12.62ms  out 79 tok/s
+[no_async] decode max-concurrency=2: TTFT p50 27.3ms  TPOT p50 12.61ms  out 158 tok/s
+[no_async] decode max-concurrency=4: TTFT p50 28.8ms  TPOT p50 12.75ms  out 312 tok/s
+[no_async] decode max-concurrency=8: TTFT p50 42.5ms  TPOT p50 13.06ms  out 605 tok/s
+[no_async] decode max-concurrency=16: TTFT p50 60.6ms  TPOT p50 13.37ms  out 1172 tok/s
+[no_async] decode max-concurrency=32: TTFT p50 94.3ms  TPOT p50 14.34ms  out 2170 tok/s
+[no_async] decode max-concurrency=64: TTFT p50 286.6ms  TPOT p50 16.92ms  out 3573 tok/s
+[no_async] server stopped
+[eager] starting server: --max-model-len 8192 --gpu-memory-utilization 0.88 --enforce-eager
+[eager] healthy after 20s
+[eager] decode max-concurrency=1: TTFT p50 42.2ms  TPOT p50 20.28ms  out 49 tok/s
+[eager] decode max-concurrency=2: TTFT p50 51.7ms  TPOT p50 20.56ms  out 97 tok/s
+[eager] decode max-concurrency=4: TTFT p50 61.9ms  TPOT p50 20.39ms  out 194 tok/s
+[eager] decode max-concurrency=8: TTFT p50 72.1ms  TPOT p50 20.44ms  out 387 tok/s
+[eager] decode max-concurrency=16: TTFT p50 87.0ms  TPOT p50 20.90ms  out 753 tok/s
+[eager] decode max-concurrency=32: TTFT p50 116.5ms  TPOT p50 21.51ms  out 1453 tok/s
+[eager] decode max-concurrency=64: TTFT p50 228.5ms  TPOT p50 22.37ms  out 2732 tok/s
+[eager] server stopped
+done

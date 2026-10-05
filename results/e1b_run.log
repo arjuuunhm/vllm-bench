@@ -1,0 +1,15 @@
+[default] starting server: --max-model-len 8192 --gpu-memory-utilization 0.88
+[default] healthy after 36s
+[default] ctx_c1 random-input-len=64: TTFT p50 19.1ms  TPOT p50 12.29ms  out 81 tok/s
+[default] ctx_c1 random-input-len=512: TTFT p50 53.3ms  TPOT p50 12.37ms  out 80 tok/s
+[default] ctx_c1 random-input-len=1024: TTFT p50 58.2ms  TPOT p50 12.54ms  out 79 tok/s
+[default] ctx_c1 random-input-len=1536: TTFT p50 61.4ms  TPOT p50 12.62ms  out 78 tok/s
+[default] ctx_c1 random-input-len=2048: TTFT p50 172.1ms  TPOT p50 12.81ms  out 75 tok/s
+[default] ctx_c8 random-input-len=64: TTFT p50 46.6ms  TPOT p50 12.62ms  out 625 tok/s
+[default] ctx_c8 random-input-len=512: TTFT p50 237.0ms  TPOT p50 13.30ms  out 561 tok/s
+[default] ctx_c8 random-input-len=1024: TTFT p50 377.3ms  TPOT p50 14.58ms  out 495 tok/s
+[default] ctx_c8 random-input-len=1536: TTFT p50 460.9ms  TPOT p50 17.00ms  out 420 tok/s
+[default] ctx_c8 random-input-len=2048: TTFT p50 795.4ms  TPOT p50 18.35ms  out 376 tok/s
+[default] server stopped
+done
+exit 0
