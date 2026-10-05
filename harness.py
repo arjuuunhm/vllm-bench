@@ -25,6 +25,12 @@ An experiment file defines a module-level EXPERIMENT dict:
 
 Results land in results/<experiment>/<config>/<workload>__<sweepkey>=<value>.json.
 Existing results are skipped unless --force, so an interrupted run can be resumed.
+
+The prefix cache (and any external/offload cache) is reset before every bench point, so
+points on the same server don't share cached KV. Without this, the random dataset with a
+fixed --seed reuses the same prompt offsets at every point, and a longer prompt shares its
+leading tokens with the previous point's shorter prompt. The reset endpoint needs
+VLLM_SERVER_DEV_MODE=1, which start_server sets.
 """
 
 from __future__ import annotations
@@ -87,6 +93,19 @@ def server_healthy() -> bool:
         return False
 
 
+def reset_prefix_cache(retries: int = 10) -> None:
+    # Fails (success=false) while blocks are still held, e.g. by requests that are
+    # still finishing or in-flight offload transfers; retry briefly.
+    url = f"{BASE_URL}/reset_prefix_cache?reset_external=true"
+    for _ in range(retries):
+        req = urllib.request.Request(url, method="POST")
+        with urllib.request.urlopen(req, timeout=10) as r:
+            if json.loads(r.read()).get("success"):
+                return
+        time.sleep(1)
+    raise RuntimeError(f"prefix cache reset failed after {retries} attempts")
+
+
 def gpu_mem_used_mib() -> int:
     out = subprocess.check_output(
         ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"]
@@ -107,7 +126,8 @@ def start_server(model: str, args: list[str], env_extra: dict, log_path: Path):
     if server_healthy():
         sys.exit(f"Something is already serving on port {PORT}; stop it first.")
     cmd = ["vllm", "serve", model, "--port", str(PORT), *args]
-    env = {**os.environ, **env_extra}
+    # Dev mode exposes /reset_prefix_cache (see reset_prefix_cache).
+    env = {**os.environ, "VLLM_SERVER_DEV_MODE": "1", **env_extra}
     log = open(log_path, "w")
     log.write(f"$ {' '.join(cmd)}\n# env overrides: {env_extra}\n\n")
     log.flush()
@@ -152,6 +172,7 @@ def run_bench(model: str, wl: dict, key: str, value, out_dir: Path, fname: str) 
         "--save-result", "--result-dir", str(out_dir), "--result-filename", fname,
         *wl["args"],
     ]
+    reset_prefix_cache()
     before = scrape_metrics()
     t0 = time.time()
     res = subprocess.run(cmd, capture_output=True, text=True, cwd=VLLM_DIR)
@@ -172,6 +193,7 @@ def run_bench(model: str, wl: dict, key: str, value, out_dir: Path, fname: str) 
         "sweep_value": value,
         "bench_cmd": cmd,
         "wall_s": wall,
+        "prefix_cache_reset": True,
         "metrics_delta": {k: after.get(k, 0) - before.get(k, 0) for k in METRICS_OF_INTEREST},
     }
     path.write_text(json.dumps(data, indent=2))

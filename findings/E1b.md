@@ -34,3 +34,4 @@ The random dataset builds prompt *i* from `offset_i + arange(L)` with offsets dr
 L=512 prompts' tokens (hit ≈ 512/1024 ≈ 60% observed). Doesn't affect decode ITL (attention
 still reads the full KV), but **understates TTFT and prefill stalls** here and in E1. Must fix
 before E2/E3: per-point seed or `--no-enable-prefix-caching` (or restart server per point).
+**Fixed 2026-10-05:** the harness now resets the prefix cache before every point (see NOTEBOOK §3).

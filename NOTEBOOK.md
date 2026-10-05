@@ -86,11 +86,21 @@ python summarize.py results/e1_decode
   counters** (prefix cache queries/hits, external (offload) cache hits, preemptions, token counts).
 - Bench defaults: p50/p90/p99 for TTFT/TPOT/ITL/E2EL, `--seed 0`.
 
+- **Prefix cache is reset before every point** (`POST /reset_prefix_cache?reset_external=true`;
+  servers launch with `VLLM_SERVER_DEV_MODE=1` to expose it). Each result's `harness` block
+  has `prefix_cache_reset: true`.
+
 ### Known harness issues
-- **Cross-point prefix-cache hits.** The random dataset with a fixed `--seed 0` reuses prompt
-  offsets across sweep points on the same server, so later points get 11–73% prefix hits.
-  Understates TTFT/prefill cost. Fix before E2/E3 (per-point seed, `--no-enable-prefix-caching`,
-  or restart per point). Details: [findings/E1b.md](findings/E1b.md#caveat--prefix-cache-hits-in-random-workloads-1173).
+- **Cross-point prefix-cache hits — fixed 2026-10-05.** The random dataset with a fixed
+  `--seed 0` reuses prompt offsets across sweep points, so on a shared server later points got
+  11–73% prefix hits ([findings/E1b.md](findings/E1b.md#caveat--prefix-cache-hits-in-random-workloads-1173)).
+  The per-point reset removes these hits. Checked with a c=1 sweep (L=512 then 1024): the
+  1024-token point dropped from 59.6% to 19.7% hits. **E1/E1b results predate the fix.**
+- **Warmups re-send request 0 (not fixable from the harness).** `vllm bench serve` sends its
+  warmups using the first measured prompt, so the warmups and measured request 0 get full
+  prefix hits: 1 of N measured requests has near-zero prefill. The
+  `/metrics` deltas also include the warmups (e.g. 4 warmups × 1024 tokens of hits at L=1024 —
+  all of the 19.7% above). For E3 hit-rate analysis, use `--num-warmups 0` or subtract them.
 
 ### Logging a new experiment
 1. Add `experiments/<exp>.py`, run it through the harness.
@@ -136,7 +146,7 @@ TTFT experiment and feeds directly into the adaptive-chunk-budget project below.
 
 ## 5. Next steps (pick up here)
 
-- [ ] **Fix cross-point prefix-cache hits** in the harness (§3 known issues) before E2/E3.
+- [x] **Fix cross-point prefix-cache hits** in the harness — per-point reset (§3).
 - [ ] **E1p** — profile the ~2.6 ms overhead at c=1 (torch profiler): non-GEMM kernels (norms,
       RoPE, sampling) vs inter-step gaps.
 - [ ] **E2** — chunked prefill budget sweep on the mixed workload.
